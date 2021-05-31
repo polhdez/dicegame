@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dice Game</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <link rel="stylesheet" href="/assets/dist/css/bootstrap.min.css ">
+    <link rel="stylesheet" href="/assets/font-awesome/css/all.css">
+</head>
+
+<body>
+
+<!-- Login form, enabled by default -->
+<div id="login">
+    <section class="pt-5 pb-5 bg-white" style=" ">
+        <div class="container">
+            <div
+                    class="row   justify-content-center header-h100 align-items-center">
+                <div class="col-12 col-md-5 text-center">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <i class="fas fa-dice fa-5x"></i>
+                            <h2 class="display-5 fw-bold ">Log In</h2>
+                            <input id="username" type="text" class="form-control mt-5"
+                                   placeholder="Username">
+                            <input id="password" type="password" class="form-control mb-1  mt-4"
+                                   placeholder="Password">
+                            <button id="login_button" class="btn btn-primary btn-lg w-100 mt-5"
+                                    type="button">Login
+                            </button>
+                            <button id="register_button" class="btn btn-secondary btn-lg w-100 mt-5"
+                                    type="button">Register
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Main page -->
+
+<div id="main" class="d-none">
+    <nav class="navbar navbar-light bg-white  navbar-expand-md">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-dice"></i>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbar_games" aria-controls="navbar_games"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar_games">
+                <ul class="navbar-nav me-auto">
+                    <li id="first_game" class="nav-item">
+                        <button id="first_game_button" class="btn btn-dark ms-md-3">First Game</button>
+                    </li>
+                    <li id="second_game" class="nav-item">
+                        <button id="second_game_button" class="btn btn-light ms-md-3">Second Game</button>
+                    </li>
+                    <li id="third_game" class="nav-item">
+                        <button id="third_game_button" class="btn btn-light ms-md-3">Third Game</button>
+                    </li>
+                </ul>
+                <ul
+                        class="navbar-nav justify-content-end d-none d-lg-flex ms-md-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/polhdez"><i class="fab fa-github"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <button id="logout_button" class="btn btn-outline-dark ms-md-3">Logout</button>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="jumbotron py-5">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-md-6">
+                    <i class="fas fa-dice fa-5x"></i>
+                    <h1 class="jumbotron-heading">Dice Game</h1>
+                    <p id="welcome" class="lead text-muted"></p>
+                    <p class="lead text-muted">Three dice games, powered by Spring, JWT, MongoDB, Jquery and Bootstrap.</p>
+
+                    <p class="text-primary" id="game_description">
+                        In the first game you win if you get more than a 7.
+                    </p>
+
+                    <p>
+                        <button id="play_button" class="btn btn-primary my-2">Play</button>
+                    </p>
+
+                    <ul class="list-group d-none" id="game_result">
+                        <li id="game_type" class="list-group-item"></li>
+                        <li id="first_roll" class="list-group-item"></li>
+                        <li id="second_roll" class="list-group-item"></li>
+                        <li id="is_winner" class="list-group-item"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="games_list" class="container text-center d-none">
+    <p class="lead text-muted">Games played</p>
+    <table class="table table-sm table-bordered table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Game Type</th>
+            <th scope="col">First Roll</th>
+            <th scope="col">Second Roll</th>
+            <th scope="col">Win</th>
+        </tr>
+        </thead>
+        <tbody id="games_table">
+
+        </tbody>
+    </table>
+</div>
+
+<section class="">
+    <footer class="pt-4 pb-4 ">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col">
+                    <p>🄯 2021 Pol Hernández Vila</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</section>
+
+<!-- Bootstrap -->
+<script type="text/javascript" src="/assets/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Jquery -->
+<script type="text/javascript" src="/assets/js/jquery-3.6.0.min.js"></script>
+
+<script type="text/javascript">
+
+    const myStorage = window.sessionStorage;
+
+    function login() {
+        let token = myStorage.getItem("token");
+        $.ajaxSetup({
+            headers: {
+                'Authorization': token,
+            }
+        })
+
+        $.post("/api/users/checktoken").done(res => {
+            if (res) {
+                // If token is valid hide login form and show main ui
+                $("#login").toggleClass("d-none", true)
+                $("#main").toggleClass("d-none", false)
+                $("#ranking_container").toggleClass("d-none", false)
+                welcome()
+                showGameList()
+            }
+        })
+    }
+
+    $(document).ready(login())
+
+    // Button logic
+    $("#play_button").click(function() {
+        console.log(getGameTypeFromNavbar())
+        $.get("/api/games/play", {
+            type: getGameTypeFromNavbar(),
+        }).done(game => {
+            $("#game_result").toggleClass("d-none", false)
+            $("#game_type").html("<b>Game type: </b>" + game.type)
+            $("#first_roll").html("<b>First roll: </b>" + game.firstRoll)
+            $("#second_roll").html("<b>Second roll: </b>" + game.secondRoll)
+            $("#is_winner").html("<b>Winner: </b>" + game.win)
+        })
+    })
+
+    $("#logout_button").click(function (){
+        myStorage.removeItem("token");
+        $("#login").toggleClass("d-none", false)
+        $("#main").toggleClass("d-none", true)
+        $("#games_list").toggleClass("d-none", true)
+    })
+
+    $("#login_button").click(function () {
+        // deleting the header so it doesnt bug out, TODO a better fix
+        delete $.ajaxSettings.headers["Authorization"];
+
+        $.post("/api/users/login", {
+            username: $("#username").val(),
+            password: $("#password").val()
+        }).done(token => {
+            // Store token to sessionStorage
+            myStorage.setItem("token", token)
+            login();
+            // Restoring the header for future requests, TODO a better fix
+            $.ajaxSetup({
+                headers: {
+                    'Authorization': token,
+                }
+            })
+        }).fail(function () {
+            alert("Incorrect login!")
+        })
+    })
+
+
+    $("#register_button").click(function (){
+        delete $.ajaxSettings.headers["Authorization"];
+        $.post("/api/users/register", {
+            username: $("#username").val(),
+            password: $("#password").val()
+        }).done(function() { alert("Register successful!") })
+            .fail(function() { alert("Registration failed!") })
+    })
+
+    // Switching game types
+    $("#first_game_button").click(function () {
+        $("#navbar_games").find(".btn").toggleClass("btn-dark", false).toggleClass("btn-light", true)
+        $("#first_game_button").toggleClass("btn-dark", true)
+        $("#game_description").html("In the first game you win if you get more than a 7.")
+        showGameList()
+    })
+
+    $("#second_game_button").click(function () {
+        $("#navbar_games").find(".btn").toggleClass("btn-dark", false).toggleClass("btn-light", true)
+        $("#second_game_button").toggleClass("btn-dark", true)
+        $("#game_description").html("In the second game you win if you get more than a 10.")
+        showGameList()
+
+    })
+
+
+    $("#third_game_button").click(function () {
+        $("#navbar_games").find(".btn").toggleClass("btn-dark", false).toggleClass("btn-light", true)
+        $("#third_game_button").toggleClass("btn-dark", true)
+        $("#game_description").html("In the third game you win if you get less than a 6.")
+        showGameList()
+    })
+
+    // Game requests here
+    function getGameTypeFromNavbar() {
+        switch ($("#navbar_games").find(".btn-dark").attr("id")) {
+            case "first_game_button":
+                return "1";
+                break;
+            case "second_game_button":
+                return "2";
+                break;
+            case "third_game_button":
+                return "3";
+        }
+    }
+
+    // function to get the player name and add it to the welcome text
+
+    function welcome() {
+        $.get("/api/users/loggedUser").done(user => {
+            $("#welcome").html("Welcome " + user.username)
+        })
+    }
+
+    // function to fetch data and put it in the table
+    function showGameList() {
+
+        $("#games_list").toggleClass("d-none", true);
+        $("#games_table").html("")
+        $.getJSON("/api/games/players", {
+            type: getGameTypeFromNavbar(),
+        }).done(games => {
+            console.log(games)
+            $.each(games, (i, game) => {
+                $("#games_table").append("<tr scope='row'><td>" + game.type +
+                    "</td><td>" + game.firstRoll +
+                    "</td><td>" + game.secondRoll +
+                    "</td><td>" + game.win +
+                    "</td></tr>")
+            })
+        })
+
+        $("#games_list").toggleClass("d-none", false);
+    }
+
+</script>
+
+</body>
+</html>
