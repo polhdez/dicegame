@@ -178,7 +178,6 @@
 
     // Button logic
     $("#play_button").click(function() {
-        console.log(getGameTypeFromNavbar())
         $.get("/api/games/play", {
             type: getGameTypeFromNavbar(),
         }).done(game => {
@@ -187,6 +186,7 @@
             $("#first_roll").html("<b>First roll: </b>" + game.firstRoll)
             $("#second_roll").html("<b>Second roll: </b>" + game.secondRoll)
             $("#is_winner").html("<b>Winner: </b>" + game.win)
+            showGameList()
         })
     })
 
